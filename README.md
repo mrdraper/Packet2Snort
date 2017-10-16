@@ -123,7 +123,7 @@ alert udp any any -> 10.8.27.1 53 (msg: "Suspicious IP 10.8.27.1 and port 53 det
 
 --- DNS ---
 
-alert udp $HOME_NET any -> any 53 (msg: "Suspicious DNS request for ow83yu4gtopw3u.win. detected!"; content:"|01 00 00 01 00 00 00 00 00 00|"; depth:10; offset:2; content:"|0E|ow83yu4gtopw3u|03|win"; fast_pattern; nocase; distance:0; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)
+alert udp $HOME_NET any -> any 53 (msg: "Suspicious DNS request for ow83yu4gtopw3u.win. detected!"; content:"|01 00 00 01 00 00 00 00 00 00|"; depth:10; offset:2; content:"|0E|ow83yu4gtopw3u|03|win|00|"; fast_pattern; nocase; distance:0; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)
 ```
 5. Test, and then implement the rule(s) you want that have been generated. Win!
 
