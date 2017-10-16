@@ -42,8 +42,9 @@ Currently, this script automatically outputs the following rules from a packet:
 1	Standard query 0x429b A ow83yu4gtopw3u.win	0.000000	10.8.29.102	10.8.27.1	DNS	78
 
 2. We need to know the packet number (easily spotted in a tool like WireShark). Alternatively, you can read the pcap with the -r switch and determine the packet number from there, since the script automatically outputs packetnumbers in this mode, for example:
-
+```
 $ python packet2snort.py -r malware.pcap
+
 --------
 Summary: <malware.pcap: TCP:2273 UDP:2 ICMP:0 Other:0>
 --------
@@ -51,9 +52,9 @@ Summary: <malware.pcap: TCP:2273 UDP:2 ICMP:0 Other:0>
 2 Ether / IP / UDP / DNS Ans "119.28.47.202" 
 3 Ether / IP / TCP 10.8.29.102:49165 > 119.28.47.202:https S
 4 Ether / IP / TCP 119.28.47.202:https > 10.8.29.102:49165 SA / Padding
-
+```
 3. Once we know the packet number, use the switch -p with the correct packet number (read point 2) to display the packet.
-
+```
 python packet2snort.py -r malware.pcap -p 1
 
 --------
@@ -106,10 +107,10 @@ Summary: <malware.pcap: TCP:2273 UDP:2 ICMP:0 Other:0>
            an        = None
            ns        = None
            ar        = None
-
+```
 
 4. Next, use the -s switch to generate snort rules from this packet. (Don't forget to change the sid to the number right for your environment.) We can see the following output:
-
+```
 $ python packet2snort.py -r malware.pcap -p 1 -s
  ----- Snort Rules ----- 
 
@@ -123,7 +124,7 @@ alert udp any any -> 10.8.27.1 53 (msg: "Suspicious IP 10.8.27.1 and port 53 det
 --- DNS ---
 
 alert udp $HOME_NET any -> any 53 (msg: "Suspicious DNS request for ow83yu4gtopw3u.win. detected!"; content:"|01 00 00 01 00 00 00 00 00 00|"; depth:10; offset:2; content:"|0E|ow83yu4gtopw3u|03|win"; fast_pattern; nocase; distance:0; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)
-
+```
 5. Test, and then implement the rule(s) you want that have been generated. Win!
 
 ### Known issues
