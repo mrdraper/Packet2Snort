@@ -135,7 +135,7 @@ Some issues I encountered along the way:
 This script was just an experiment with Snort, Python and Scapy. The following are some things i want to add in the future:
 - HTTPS support
 	- SSL Certs, etc.
-- Support for multiple packet conversions (or entire pcaps)
+~~- Support for multiple packet conversions (or entire pcaps)~~
 - SMB support
 - More advanced ruling on IP/TCP layer (Offset, checksum, etc.)
 - ...
