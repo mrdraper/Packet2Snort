@@ -27,26 +27,26 @@ def usage():
 
 #converts layer 3 and 4 protocols into rules:
 # IP, TCP, UDP & ICMP
-def basicconvert(singlepacket):
+def basicconvert(singlepacket, packetnr0):
 	try:
-		print "\n ----- Snort Rules ----- \n"
+		print ("\n{1}----- Snort Rules For Packet Number {0}-----{2}".format(packetnr0, G, W))
 # Print IP Layer Rules
 # Check if the IP layer is present in the packet
 		if IP in singlepacket:
-			print "------ Layer 3/4 Rules -------"
+			print ("{0}----- Layer 3/4 Rules -------{1}".format(G, W))
 			ipsource = singlepacket[IP].src
 			ipdest = singlepacket[IP].dst
 # Print TCP Layer Rules
 # Check if TCP is present in the packet
 			if TCP in singlepacket:
-				print "\n--- TCP ---\n"
+				print ("{0}----- TCP ---\n{1}".format(G, W))
 				tcpsourceport = singlepacket[TCP].sport
 				tcpdestport = singlepacket[TCP].dport
 				print ("alert tcp {0} {1}-> $HOME_NET any (msg: \"Suspicious IP {0} and port {1} detected!\"; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)".format(tcpsourceport, tcpdestport))
 				print ("alert tcp $HOME_NET any -> {0} {1} (msg: \"Suspicious IP {0} and port {1} detected!\"; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)".format(ipdest, tcpdestport))
 # Check if DNS is present in the packet				
 				if DNS in singlepacket:
-					print "\n--- DNS ---\n"
+					print ("{0}----- DNS ---\n{1}".format(G, W))
 					hostname = singlepacket[DNSQR].qname
 					if DNSRR in singlepacket:
 						hostaddr = singlepacket[DNSRR].rdata	
@@ -68,10 +68,10 @@ def basicconvert(singlepacket):
 						print "\b\"; fast_pattern; nocase; distance:0; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)"				
 # Check if a HTTP request is present in the packet				
 				elif singlepacket.haslayer(http.HTTPRequest):
-					print "\n------ Layer 7 Rules ------"
-					print "\n--- HTTP ---\n"
+					print ("\n{0}----- Layer 7 Rules -----{1}".format(G, W))
+					print ("{0}----- HTTP -----\n{1}".format(G, W))
 					httppacket = singlepacket.getlayer(http.HTTPRequest)
-					print ("HOST:\nalert tcp $HOME_NET any -> any $HTTP_PORTS (msg: \"Suspicious HTTP {0[Method]} request to {0[Host]} detected!\"; flow:established,to_server; content:\"Host|3a 20|{0[Host]}|0d 0a|\"; http_header; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)".format(httppacket.fields))
+					print ("Host:\nalert tcp $HOME_NET any -> any $HTTP_PORTS (msg: \"Suspicious HTTP {0[Method]} request to {0[Host]} detected!\"; flow:established,to_server; content:\"Host|3a 20|{0[Host]}|0d 0a|\"; http_header; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)".format(httppacket.fields))
 					print ("\nFilename:\nalert tcp $HOME_NET any -> any $HTTP_PORTS (msg: \"Suspicious HTTP file name \"{0[Path]}\" requested at {0[Host]}!\"; flow:established,to_server; content:\"{0[Path]}\"; http_uri; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)".format(httppacket.fields))
 # Check if a HTTP response is present in the packet	(Currently not active)			
 #				elif singlepacket.haslayer(http.HTTPResponse):
@@ -82,14 +82,14 @@ def basicconvert(singlepacket):
 # Print UDP Layer Rules
 # Check if UDP is present in the packet
 			elif UDP in singlepacket:
-				print "\n--- UDP ---\n"
+				print ("{0}----- UDP -----\n{1}".format(G, W))
 				udpsrcport = singlepacket[UDP].sport
 				udpdestport = singlepacket[UDP].dport
 				print ("alert udp {0} {1} -> any any (msg: \"Suspicious IP {0} and port {1} detected!\"; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)".format(ipsource, udpsrcport))
 				print ("alert udp any any -> {0} {1} (msg: \"Suspicious IP {0} and port {1} detected!\"; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)".format(ipdest, udpdestport))
 # Check if DNS is present in the packet				
 				if DNS in singlepacket:
-					print "\n--- DNS ---\n"
+					print ("{0}----- DNS -----\n{1}".format(G, W))
 					hostname = singlepacket[DNSQR].qname
 					if DNSRR in singlepacket:
 						hostaddr = singlepacket[DNSRR].rdata	
@@ -112,18 +112,18 @@ def basicconvert(singlepacket):
 # Print ICMP Layer Rules
 # Check if ICMP is present in the packet
 			elif ICMP in singlepacket:
-				print "--- ICMP ---\n"
+				print ("{0}----- ICMP -----\n{1}".format(G, W))
 				icmptype = singlepacket[ICMP].type
 				print ("alert icmp {0} any -> {1} any (msg: \"Suspicious ICMP packet from {0} to {1} with type {2}!\"; icode:0; itype:{2}; reference:Packet2Snort; classtype:trojan-activity; sid:xxxx; rev:1;)".format(ipsource, ipdest, icmptype))
 # Throw error when no L4 protocols found
 			else:
-				print "No UDP/TCP Layer 4 Protocol Found!"
+				print ("{0}No UDP/TCP Layer 4 Protocol Found!{1}".format(O, W))
 				sys.exit(1)
 # Throw error when no IP found
 		else:
-			print "No IP Layer 3 Protocol Found!"
+			print ("{0}No IP Layer 3 Protocol Found!{1}".format(O, W))
 			sys.exit(1)
-		print "\nDon't forget to change the sid of the generated rule(s)!"
+		print ("\n{0}Don't forget to change the sid of the generated rule(s)!{1}".format(O, W))
 # Print error when they occur	
 	except Exception, e:
 		print "Error: ", e
@@ -149,7 +149,7 @@ def main():
 			if opt in ('-r'):
 				cap = args
 			elif opt in ('-p'):
-				packetnr = args
+				packetnr = args.split(',')
 			elif opt in ('-h'):
 				usage()
 			elif opt in ('-s'):
@@ -167,19 +167,20 @@ def main():
 				sys.exit(1)
 		
 #Output summary of pcap
-		print "--------"
+		print (O + "--------")
 		print "Summary: " + str(scapy_cap)
-		print "--------"
+		print ("--------" + W)
 # Check if a packet number has been supplied, and thus the variable packetnr is filled
 		if packetnr != None:
-			packetnr0 = int(packetnr) - 1
-			singlepacket = scapy_cap[int(packetnr0)]
+			for i in packetnr:
+				packetnr0 = int(i) - 1
+				singlepacket = scapy_cap[int(packetnr0)]
 # Check if the -s paramater is give, and thus the script needs to output Snort.
-			if snortoutput == True:
-				basicconvert(singlepacket)
+				if snortoutput == True:
+					basicconvert(singlepacket, packetnr0)
 # If the -s paramater is not give, just output the details of the packet selected.
-			else:
-				print str(scapy_cap[int(packetnr0)].show())
+				else:
+					print str(singlepacket.show())
 # Check if the pcap file is given
 		elif cap != None:
 			countpacket = 1
@@ -198,5 +199,8 @@ def main():
 		usage()
 		pass
 
+G = '\033[32m'
+W = '\033[0m'
+O = '\033[33m'
 if __name__ == '__main__':
 	main()
